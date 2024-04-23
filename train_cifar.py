@@ -50,7 +50,7 @@ def train():
                                              shuffle=False, num_workers=2)
 
     # Define ResNet-18 model
-    model = models.vit_h_14(pretrained=False, num_classes=10)
+    model = models.vit_l_32(pretrained=False, num_classes=10)
     model.to(device)
 
     # Define loss function and optimizer
@@ -60,7 +60,7 @@ def train():
                     # {'params': model.parameters()},
                     {'params': model.parameters(), 'rank': 16, 'update_projection_step': 300, 'scale': 0.25}
                     ]
-    optimizer = AdamW(param_groups, lr=0.005, weight_decay=0.005)
+    optimizer = AdamW(param_groups, lr=0.0005, weight_decay=0.005)
 
     scaler = torch.cuda.amp.GradScaler()
 
@@ -87,10 +87,8 @@ def train():
     print(f"Total number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")  # Sum the number of parameters
     print(f"Total number of trainable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
 
-    for k,v in model.named_parameters():
-        print(k, v.shape)
 
-    # # Training...
+    # Training...
     start_time = time.time()
     for epoch in range(epochs):  # Loop over the dataset multiple times
         running_loss = 0.0
