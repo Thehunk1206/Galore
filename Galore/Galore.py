@@ -50,6 +50,9 @@ class LowRankGradProjector:
 
     def project_back(self, low_rank_grad: torch.Tensor) -> torch.Tensor:
         # Project low rank gradients back to full rank space
+        if self.projector_matrix is None:
+            return low_rank_grad
+
         if low_rank_grad.dim() == 1:
             return low_rank_grad
         
@@ -129,7 +132,6 @@ class LowRankGradProjector:
 
         #make the smaller matrix always to be orthogonal matrix
         if sigular_matrix_type=='right':
-            # A = U[:, :self.rank] @ torch.diag(s[:self.rank])
             B = Vh[:, :, :self.rank, :]
             
             if not float_data:
@@ -137,7 +139,6 @@ class LowRankGradProjector:
             return B
         elif sigular_matrix_type=='left':
             A = U[:, :, :, :self.rank]
-            # B = torch.diag(s[:self.rank]) @ Vh[:self.rank, :]
             if not float_data:
                 A = A.to(original_device).type(original_type)
             return A
